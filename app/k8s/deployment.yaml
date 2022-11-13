@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  labels:
+    app: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      volumes:
+      - name: gs-credentials
+        secret:
+          secretName: gs-credentials
+      containers:
+      - name: api
+        image: asia.gcr.io/django-project-368202/server
+        imagePullPolicy: Always
+        command: ['gunicorn', 'web.wsgi:application', '-b', '0.0.0.0:8000']
+        ports:
+        - containerPort: 8000
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        volumeMounts:
+          - mountPath: /gs
+            name: gs-credentials
+        env:
+        - name: STATIC_URL
+          value: https://storage.googleapis.com/k8s-demo-scottman625-bucket/static/
+        - name: POSTGRES_SERVICE
+          value: 10.110.144.2
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_DB
+          value: postgres
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pgpassword
+              key: POSTGRES_PASSWORD
+        - name: GS_BUCKET_NAME
+          value: k8s-demo-scottman625-bucket

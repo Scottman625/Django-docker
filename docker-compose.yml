@@ -1,0 +1,56 @@
+version: '3.9'
+services:
+    
+    db:
+      container_name: 'postgres'
+      image: postgres
+      ports:
+        - "5432:5432"
+        # (HOST:CONTAINER)
+      volumes:
+        - pgdata:/var/lib/postgresql/data/
+      networks:
+        - proxy
+      logging:
+        driver: "json-file"
+        options:
+          max-file: "1"    # default 是 1
+          max-size: "200m" # default 是 -1, 也就是沒有限制
+
+    web:
+      build: ./app
+      entrypoint: /docker_api/docker-entrypoint.sh
+      command: python manage.py runserver 0.0.0.0:8000
+      restart: always
+
+      # ref.
+      # https://docs.djangoproject.com/en/3.0/ref/django-admin/#django-admin-createsuperuser
+      environment:
+        - DJANGO_SUPERUSER_USERNAME=admin
+        - DJANGO_SUPERUSER_PASSWORD=admin1234
+        - DJANGO_SUPERUSER_EMAIL=admin@twtrubiks.com
+
+      # volumes:
+      #   - api_data:/docker_api
+        # (HOST:CONTAINER)
+      ports:
+        - "8000:8000"
+        # (HOST:CONTAINER)
+      depends_on:
+        - db
+      networks:
+        - proxy
+      logging:
+        driver: "json-file"
+        options:
+          max-file: "1"    # default 是 1
+          max-size: "200m" # default 是 -1, 也就是沒有限制
+
+volumes:
+    api_data:
+    pgdata:
+
+networks:
+    proxy:
+      # external:
+        name: my_network

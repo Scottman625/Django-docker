@@ -1,0 +1,8 @@
+apiVersion: networking.gke.io/v1beta1
+kind: ManagedCertificate
+metadata:
+  name: web-certificate
+spec:
+  domains:
+    - 34.120.11.165
+
