@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import json
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,6 +31,8 @@ ALLOWED_HOSTS = [
     'localhost',
     'care168.com.tw',
     '149.28.22.217',
+    '0.0.0.0',
+    '*',
 ]
 
 ADMINS = (
@@ -146,16 +149,6 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': 'password123',
-#         'HOST': 'db',
-#         'PORT': 5432,
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -166,6 +159,16 @@ DATABASES = {
         'USER': os.environ.get('POSTGRES_USER')
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'PORT': 5432,
+#         'HOST': 'db',
+#         'USER': 'postgres',
+#     }
+# }
 
 
 # Password validation
@@ -209,7 +212,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = os.environ.get('STATIC_URL', 'static/')
 
 # Base url to serve media files
 MEDIA_URL = '/media/'
@@ -229,3 +232,17 @@ AUTH_USER_MODEL = 'modelCore.User'
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+
+GS_BUCKET_NAME = os.getenv('GS_BUCKET_NAME')
+GS_LOCATION = 'upload'
+if GS_BUCKET_NAME:
+    from google.oauth2 import service_account
+    # GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+    # "path/to/credentials.json")
+    GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+        '/gs/google_secret.json'
+    )
+    DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+    GS_AUTO_CREATE_ACL = os.getenv('GS_AUTO_CREATE_ACL', 'publicRead')
+    GS_DEFAULT_ACL = os.getenv('GS_DEFAULT_ACL', 'publicRead')
+    GS_CUSTOM_ENDPOINT = os.getenv('GS_CUSTOM_ENDPOINT', None)
