@@ -1,4 +1,4 @@
-FROM python:3.8.12
+FROM python:3.9
 LABEL maintainer twtrubiks
 ENV PYTHONUNBUFFERED 1
 

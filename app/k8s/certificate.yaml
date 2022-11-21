@@ -4,5 +4,5 @@ metadata:
   name: web-certificate
 spec:
   domains:
-    - 34.120.11.165
+    - scottman625.website
 

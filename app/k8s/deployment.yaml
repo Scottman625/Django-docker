@@ -20,7 +20,7 @@ spec:
         secret:
           secretName: gs-credentials
       containers:
-      - name: api
+      - name: server
         image: asia.gcr.io/django-project-368202/server
         ports:
         - containerPort: 8000

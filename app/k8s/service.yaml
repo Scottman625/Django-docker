@@ -1,15 +1,32 @@
-kind: Service
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: web-service
+#   labels:
+#     app: server
+# spec:
+#   type: NodePort
+#   ports:
+#   - name: http
+#     protocol: TCP
+#     port: 80
+#     targetPort: 8000
+#   selector:
+#     app: server
+
+
 apiVersion: v1
+kind: Service
 metadata:
-  name: api
+  name: web-service
   labels:
     app: api
 spec:
-  type: NodePort
-  ports:
-  - name: http
-    protocol: TCP
-    port: 80
-    targetPort: 8000
   selector:
     app: api
+    # tier: web
+  ports:
+  - port: 80
+    targetPort: 8000
+  type: LoadBalancer
+  loadBalancerIP: 35.221.193.223
